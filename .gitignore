@@ -1,0 +1,28 @@
+# dependencies and build output
+node_modules/
+dist/
+.wrangler/
+
+# local configuration — never commit these; *.example files are tracked
+.env
+.env.local
+.env.*.local
+.dev.vars
+.dev.vars.local
+
+# credentials
+*.pem
+*.key
+*.p12
+*.pfx
+
+# editors and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*

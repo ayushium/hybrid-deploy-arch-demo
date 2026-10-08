@@ -1,0 +1,11 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: local
+      MYSQL_DATABASE: campuswall
+    ports: ['3306:3306']
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-plocal']
+      interval: 5s
+      retries: 20

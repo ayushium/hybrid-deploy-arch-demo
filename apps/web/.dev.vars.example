@@ -1,0 +1,4 @@
+# Local wrangler dev only (pnpm dev:edge). Copy to .dev.vars.
+ALB_HOST=localhost:3000
+SHOW_STRESS=true
+BURN_MS=500

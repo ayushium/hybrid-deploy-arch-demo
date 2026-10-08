@@ -1,0 +1,36 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "campuswall",
+  "main": "src/worker.ts",
+  "compatibility_date": "2024-12-01",
+
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    // The client is a single-page app: /wall has no file on disk, so without this
+    // the assets binding 404s and only "/" works. Vite's dev server does this
+    // fallback automatically, which is why it only breaks once deployed.
+    "not_found_handling": "single-page-application"
+  },
+
+  // ---------------------------------------------------------------------------
+  // Everything environment-specific lives here, so changing it is a COMMIT.
+  // Edit this file, push to main, and Actions ships it in ~40s. There is never
+  // a reason to run wrangler from a laptop.
+  // ---------------------------------------------------------------------------
+  "vars": {
+    // Set this once, after the ALB exists.
+    "ALB_HOST": "<YOUR_ALB_DNS_NAME>",
+
+    // Reveals the load-generator button in the UI. See docs/ARCHITECTURE.md.
+    "SHOW_STRESS": "false",
+
+    // CPU burned per press of that button, in milliseconds. Lives here rather than
+    // in EC2 user data so it can be retuned mid-demo with a commit (~40s) instead
+    // of a new launch template plus an instance replacement.
+    //   too low  -> CPU never reaches the alarm threshold and nothing scales
+    //   too high -> requests queue; harmless, and arguably the point
+    // The API clamps whatever arrives to 0-2000ms.
+    "BURN_MS": "2000"
+  }
+}

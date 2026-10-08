@@ -1,0 +1,423 @@
+/* ==========================================================================
+   Campus Wall — light theme built on Apple's Human Interface tokens.
+
+   Reference points: systemGroupedBackground for the canvas, white for
+   surfaces, inset grouped lists for choices, hairline separators, SF Pro via
+   -apple-system, and the iOS system colour palette for accents.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* iOS system colours */
+  --blue:   #007aff;
+  --orange: #ff9500;
+  --green:  #34c759;
+  --red:    #ff3b30;
+
+  /* Backgrounds */
+  --canvas:  #f2f2f7;          /* systemGroupedBackground */
+  --surface: #ffffff;
+  --fill-quaternary: rgba(116, 116, 128, 0.08);
+  --fill-tertiary:   rgba(118, 118, 128, 0.12);
+
+  /* Labels */
+  --label:   #000000;
+  --label-2: rgba(60, 60, 67, 0.60);
+  --label-3: rgba(60, 60, 67, 0.30);
+
+  /* Hairlines */
+  --separator: rgba(60, 60, 67, 0.16);
+  --hairline:  rgba(0, 0, 0, 0.04);
+
+  /* Elevation — barely there, by design */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
+  --shadow-key:  0 1px 2px rgba(0, 0, 0, 0.05), 0 6px 16px rgba(0, 0, 0, 0.08);
+
+  --r-card: 16px;
+  --r-key:  14px;
+  --tap:    56px;
+  --gutter: 16px;
+
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+          "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--canvas);
+  color: var(--label);
+  font-family: var(--font);
+  font-size: 17px;              /* iOS body */
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
+}
+
+/* ---------------------------------------------------------------- primitives */
+
+/* Large Title, as the iOS navigation bar renders it. */
+.title {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.032em;
+}
+
+/* Grouped-list section header: uppercase, tracked out, secondary. */
+/* Flush with the cards below it. iOS indents section headers to the cell text,
+   but that only reads as deliberate when the large title is inset too — here
+   everything shares one left edge instead. */
+.group-label {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--label-2);
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-card);
+}
+
+/* Instance identity: tinted pill, coloured dot, colour carried by the text —
+   the iOS way of tinting, rather than a saturated block of background. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 590;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--tint) 12%, transparent);
+  color: color-mix(in srgb, var(--tint) 78%, #1c1c1e);
+}
+.chip::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tint);
+  flex: none;
+}
+
+.mono { font-variant-numeric: tabular-nums; }
+
+button {
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+button:disabled { cursor: default; }
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--blue) 45%, transparent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ================================================================ client view */
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-top: calc(16px + env(safe-area-inset-top));
+  padding-right: calc(var(--gutter) + env(safe-area-inset-right));
+  padding-bottom: 0;
+  padding-left: calc(var(--gutter) + env(safe-area-inset-left));
+}
+
+.nav { padding: 12px 0 22px; }
+.nav__name {
+  font-weight: 640;
+  color: var(--blue);
+  letter-spacing: -0.014em;
+}
+
+.nav__sub {
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 1.33;
+  color: var(--label-2);
+  letter-spacing: -0.012em;
+}
+
+.section { margin-bottom: 26px; }
+
+/* Reactions — five square keys */
+.keys {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.key {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: clamp(26px, 7.5vw, 32px);
+  line-height: 1;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-key);
+  box-shadow: var(--shadow-card);
+  transition: transform 140ms cubic-bezier(0.2, 0.9, 0.3, 1), background 140ms ease;
+}
+.key:active:not(:disabled) { transform: scale(0.92); background: var(--canvas); }
+.key:disabled { opacity: 0.38; }
+
+/* Messages — an inset grouped list */
+.list {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.list__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 14px 18px;
+  background: transparent;
+  border: 0;
+  font-size: 17px;
+  letter-spacing: -0.015em;
+  color: var(--label);
+  text-align: left;
+  transition: background 120ms ease;
+}
+/* Hairline inset from the text, flush to the right — iOS list convention. */
+.list__row + .list__row::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 18px;
+  height: 1px;
+  background: var(--separator);
+  transform: scaleY(0.5);      /* true hairline on retina */
+  transform-origin: top;
+}
+.list__row:active:not(:disabled) { background: var(--fill-quaternary); }
+.list__row:disabled { color: var(--label-3); }
+
+/* Dock — sticky, translucent, hairline top edge */
+/* Breaks out of .app's gutter by exactly the gutter, so the bar and its
+   separator run edge to edge without widening the document. A bigger negative
+   margin (say -100px) would push scrollWidth past the viewport and shove the
+   whole centred layout sideways. */
+.dock {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  margin-left: calc(-1 * (var(--gutter) + env(safe-area-inset-left)));
+  margin-right: calc(-1 * (var(--gutter) + env(safe-area-inset-right)));
+  padding: 12px calc(var(--gutter) + env(safe-area-inset-right))
+           calc(14px + env(safe-area-inset-bottom)) calc(var(--gutter) + env(safe-area-inset-left));
+  background: color-mix(in srgb, var(--canvas) 78%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+/* Absolute, not a negative-margin block: spans the dock's padding box with no
+   effect on document width. */
+.dock::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--separator);
+  transform: scaleY(0.5);
+  transform-origin: top;
+}
+
+.btn--stress {
+  display: block;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 16px;
+  border: 0;
+  border-radius: var(--r-key);
+  background: var(--orange);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  box-shadow: var(--shadow-key);
+  transition: transform 140ms cubic-bezier(0.2, 0.9, 0.3, 1), filter 140ms ease;
+}
+.btn--stress:active:not(:disabled) { transform: scale(0.975); filter: brightness(0.94); }
+.btn--stress:disabled { opacity: 0.4; box-shadow: none; }
+
+.dock__status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 34px;
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--label-2);
+  letter-spacing: -0.008em;
+}
+.dock__sent { color: var(--label); font-weight: 500; }
+.dock__err  { color: var(--red); }
+
+/* =============================================================== display view */
+
+.wall {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 40px) clamp(16px, 3vw, 40px) 48px;
+}
+
+.wall__nav {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 20px;
+}
+.wall__title { font-size: clamp(28px, 3.4vw, 44px); }
+.wall__sub {
+  margin: 4px 0 0;
+  font-size: clamp(14px, 1.2vw, 16px);
+  color: var(--label-2);
+  letter-spacing: -0.01em;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: clamp(14px, 1.3vw, 17px);
+  font-weight: 590;
+  letter-spacing: -0.01em;
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+  color: color-mix(in srgb, var(--green) 72%, #1c1c1e);
+  white-space: nowrap;
+}
+.status::before {
+  content: '';
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--green) 18%, transparent);
+}
+.status.is-down {
+  background: color-mix(in srgb, var(--red) 12%, transparent);
+  color: color-mix(in srgb, var(--red) 76%, #1c1c1e);
+}
+.status.is-down::before {
+  background: var(--red);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 18%, transparent);
+}
+
+.panel { padding: 22px 24px; margin-bottom: 22px; }
+.panel__label {
+  margin: 0 0 18px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--label-2);
+}
+
+.meter { display: flex; flex-direction: column; gap: 14px; }
+.meter__row {
+  display: grid;
+  grid-template-columns: 9.5rem 5rem 1fr 3rem;
+  align-items: center;
+  gap: 16px;
+}
+.meter__az { font-size: 14px; color: var(--label-2); }
+.meter__track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--fill-tertiary);
+  overflow: hidden;
+}
+.meter__bar {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--tint);
+  transition: width 600ms cubic-bezier(0.25, 0.8, 0.3, 1);
+}
+.meter__hits {
+  text-align: right;
+  font-size: 15px;
+  font-weight: 590;
+  color: var(--label-2);
+}
+.meter__empty { margin: 0; color: var(--label-3); font-size: 15px; }
+
+.feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.feed__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 22px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+}
+/* Instance identity is carried by the tinted chip, not a coloured edge —
+   a contrasting left border reads as a detached tab against a rounded card. */
+.feed__text  { font-size: clamp(17px, 1.7vw, 22px); letter-spacing: -0.018em; }
+.feed__emoji { font-size: clamp(30px, 3.4vw, 44px); line-height: 1; }
+.feed__nick {
+  font-weight: 590;
+  color: var(--label);
+  letter-spacing: -0.012em;
+}
+.feed__meta  {
+  display: flex; align-items: center; gap: 12px;
+  font-size: clamp(13px, 1.2vw, 15px);
+  color: var(--label-2);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------- adaptations */
+
+/* Short phones: tighten so all eleven controls stay thumb-reachable. */
+@media (max-height: 720px) {
+  .app { padding-top: calc(8px + env(safe-area-inset-top)); }
+  .nav { padding: 6px 0 16px; }
+  .title { font-size: 28px; }
+  .nav__sub { display: none; }
+  .section { margin-bottom: 18px; }
+  .list__row { min-height: 50px; padding: 11px 18px; font-size: 16px; }
+  .dock__status { min-height: 20px; margin-top: 8px; }
+}
+
+@media (max-width: 760px) {
+  .wall__nav { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .panel { padding: 18px; }
+  .meter__row { grid-template-columns: 8.5rem 1fr 2.5rem; gap: 12px; }
+  .meter__az { display: none; }
+  .feed__item { padding: 14px 16px; gap: 14px; }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "hybrid-deploy-arch-demo",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@9.15.0",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down -v",
+
+    "dev:api": "pnpm --filter @campuswall/api dev",
+    "dev:fleet": "concurrently -n api1,api2,api3 -c blue,cyan,magenta \"INSTANCE_ID=i-local-1 AZ=local-a PORT=3001 STRESS_ENABLED=true pnpm dev:api\" \"INSTANCE_ID=i-local-2 AZ=local-b PORT=3002 STRESS_ENABLED=true pnpm dev:api\" \"INSTANCE_ID=i-local-3 AZ=local-a PORT=3003 STRESS_ENABLED=true pnpm dev:api\"",
+    "dev:lb": "node infra/local-lb.mjs",
+    "dev:web": "SHOW_STRESS=true BURN_MS=500 pnpm --filter @campuswall/web dev",
+
+    "dev": "pnpm db:up && concurrently -n fleet,lb,web -c auto \"pnpm dev:fleet\" \"pnpm dev:lb\" \"pnpm dev:web\"",
+    "dev:solo": "pnpm db:up && concurrently -n api,web -c blue,green \"INSTANCE_ID=i-local-1 AZ=local-a PORT=3000 STRESS_ENABLED=true pnpm dev:api\" \"pnpm dev:web\"",
+    "dev:edge": "pnpm --filter @campuswall/web dev:edge",
+
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.7.2"
+  }
+}
